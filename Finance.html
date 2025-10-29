@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Zodiac ✨</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/dist/phosphor-icons.js"></script>
+<style>
+:root{
+  --bg:#010B14;
+  --card-bg: rgba(77,208,225,0.08);
+  --text:#E0F7FA;
+  --accent:#4DD0E1;
+  --glow:#00BCD4;
+}
+body{
+  font-family:'Inter',sans-serif;
+  background: radial-gradient(circle at 20% 30%, #061726 0%, #010B14 100%);
+  color: var(--text);
+  margin:0; min-height:100vh; overflow-x:hidden;
+}
+.summary-card{
+  background: var(--card-bg);
+  border:1px solid rgba(77,208,225,0.2);
+  box-shadow:0 0 40px rgba(77,208,225,0.1);
+  transition:all 0.5s ease-out;
+  transform:translateY(20px) scale(0.95);
+  opacity:0;
+  padding:2rem; border-radius:1rem;
+}
+.summary-card.show{transform:translateY(0) scale(1); opacity:1;}
+.header-focus{
+  color: var(--accent);
+  text-shadow:0 0 25px rgba(77,208,225,0.9);
+}
+.section-title{
+  color: var(--accent);
+  border-bottom:2px solid rgba(77,208,225,0.5);
+  padding-bottom:0.5rem;font-weight:600;
+}
+.content-list li{
+  padding-left:1.5rem;margin-bottom:0.5rem;position:relative;line-height:1.6;font-weight:300;
+}
+.content-list li::before{content:'✦'; color: var(--accent); font-weight:bold; display:inline-block; width:1em;margin-left:-1em;}
+.floating-btn{
+  background: linear-gradient(90deg,var(--glow),var(--accent));
+  color: var(--bg); font-weight:700; padding:0.75rem 1.5rem; border-radius:9999px;
+  box-shadow:0 6px 25px rgba(0,188,212,0.7); transition: all 0.3s ease-in-out, transform 0.3s; display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.floating-btn:hover{transform: scale(1.15) rotateZ(2deg); box-shadow:0 8px 35px rgba(0,188,212,0.9);}
+#floatingNav{display:flex;flex-direction:column;gap:1rem;}
+#tip-text{display:block;margin-top:1rem;color:#FFD700;font-weight:600;font-size:1.2rem;text-align:center;}
+</style>
+</head>
+<body>
+<div class="flex flex-col items-center py-10 px-4 md:px-8 relative z-10">
+<div class="w-full max-w-7xl p-6 md:p-10 rounded-xl bg-white/5 shadow-2xl relative z-10">
+
+<header class="flex flex-col items-center text-center mb-8 pb-4 border-b border-white/10">
+<h1 class="text-5xl md:text-6xl font-extrabold mb-2 header-focus">Financial Zodiac ✨</h1>
+<p class="text-lg text-gray-400 italic">Discover your financial destiny, career paths, expected salary, challenges, and tips!</p>
+</header>
+
+<div id="inputForm" class="flex flex-col items-center">
+<h2 class="text-2xl md:text-3xl font-medium text-center mb-6 text-gray-200">
+Enter Your Details
+</h2>
+<div class="flex flex-col gap-4 mb-6 w-full max-w-lg">
+<input id="name" type="text" placeholder="What is your name?" class="flex-1 w-full p-3 rounded-lg text-lg bg-white/5 border border-white/20 placeholder-gray-400 text-white focus:ring-1 focus:ring-current transition">
+<input id="birth" type="date" placeholder="Your birthdate" class="flex-1 w-full p-3 rounded-lg text-lg bg-white/5 border border-white/20 text-white focus:ring-1 focus:ring-current transition">
+<select id="salary" class="flex-1 w-full p-3 rounded-lg text-lg bg-white/5 border border-white/20 text-white focus:ring-1 focus:ring-current transition">
+<option value="">Expected Salary</option>
+<option value="$30k–$50k">$30k–$50k</option>
+<option value="$50k–$80k">$50k–$80k</option>
+<option value="$80k–$120k">$80k–$120k</option>
+<option value="$120k+">$120k+</option>
+</select>
+<select id="flexibility" class="flex-1 w-full p-3 rounded-lg text-lg bg-white/5 border border-white/20 text-white focus:ring-1 focus:ring-current transition">
+<option value="">Career Flexibility</option>
+<option value="High">High (Remote, Freelance, Multi-role)</option>
+<option value="Medium">Medium (Some flexibility)</option>
+<option value="Low">Low (Structured full-time)</option>
+</select>
+</div>
+<button id="reveal" class="floating-btn text-xl px-12 py-3">
+<i class="ph ph-sparkle-fill mr-2"></i> Reveal Your Financial Zodiac
+</button>
+</div>
+
+<div id="mainReportContainer" style="display:none;">
+<h2 id="reportGreeting" class="text-3xl md:text-4xl font-bold text-center mt-6 mb-6 text-white/90">
+So, <span id="userNameDisplay" class="header-focus"></span>, here’s your Financial Zodiac reading:
+</h2>
+
+<div class="summary-card p-5 rounded-xl mb-6 show" id="archetypePanel">
+<h3 class="text-2xl font-bold section-title flex items-center mb-3"><i class="ph ph-comet-fill mr-2 text-2xl"></i> Your Financial Archetype</h3>
+<p class="text-3xl font-extrabold text-center py-4 header-focus" id="archetypeTitle"></p>
+<p id="zodiacTraits" class="text-lg text-gray-200 leading-relaxed"></p>
+</div>
+
+<div class="summary-card p-5 rounded-xl mb-6 show" id="careerPanel">
+<h3 class="text-2xl font-bold section-title flex items-center mb-3"><i class="ph ph-briefcase-fill mr-2 text-2xl"></i> Best Career Paths & Skills</h3>
+<ul id="careerList" class="content-list text-gray-200"></ul>
+</div>
+
+<div class="summary-card p-5 rounded-xl mb-6 show" id="salaryPanel">
+<h3 class="text-2xl font-bold section-title flex items-center mb-3"><i class="ph ph-currency-circle-dollar-fill mr-2 text-2xl"></i> Expected Salary & Trajectory</h3>
+<ul id="salaryList" class="content-list text-gray-200"></ul>
+</div>
+
+<div class="summary-card p-5 rounded-xl mb-6 show" id="challengePanel">
+<h3 class="text-2xl font-bold section-title flex items-center mb-3"><i class="ph ph-shield-star-fill mr-2 text-2xl"></i> Money Challenges & Tips</h3>
+<ul id="challengeList" class="content-list text-gray-200"></ul>
+</div>
+
+<div class="summary-card p-5 rounded-xl mb-6 show" id="tipPanel">
+<p id="tip-text"></p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="floatingNav" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3" style="display:none;">
+<button id="scrollToTop" class="floating-btn text-sm flex items-center"><i class="ph ph-arrow-up-fill mr-2"></i> Scroll Top</button>
+<button id="resetFloat" class="floating-btn text-sm flex items-center"><i class="ph ph-arrows-counter-clockwise mr-2"></i> Reset Data</button>
+</div>
+
+<script>
+// Zodiac & Financial Data
+const zodiacData={
+1:{title:"Capricorn – The Strategist",traits:"Disciplined, systematic, focused on long-term goals. Start budgeting and investing early.",careers:["Financial Analyst","Portfolio Manager","CPA Accountant","CIO"],salary:["$60k–$150k early career","Bonuses for top performance","Long-term wealth accumulation"],challenge:["Delegate tasks you are not expert in","Avoid overthinking small financial decisions","Start tracking small savings"]},
+2:{title:"Aquarius – The Innovator",traits:"Independent, tech-loving. Great for fintech, coding, and cryptocurrency.",careers:["Fintech Developer","Blockchain Analyst","Quantitative Researcher","VC Analyst"],salary:["$70k–$160k depending on tech role","Growth tied to project success","Performance-based bonuses"],challenge:["Trade skills for networking","Avoid lifestyle creep","Learn basic blockchain protocols"]},
+3:{title:"Pisces – The Humanitarian",traits:"Empathetic, creative, purpose-driven. Ethical finance is your path.",careers:["ESG Analyst","Microfinance Specialist","Social Impact Investing","Ethical Financial Planner"],salary:["$40k–$100k","Consulting fees growth","Value-driven earnings"],challenge:["Value emotional labor","Automate budgets","Research blockchain for charity transparency"]},
+4:{title:"Aries – The Initiator",traits:"Bold, competitive. Thrives in fast-paced finance like trading and M&A.",careers:["Trader","Investment Banker","VC Associate","High-Net-Worth Sales"],salary:["$70k–$150k entry","High bonus potential","Fast growth with careful risk management"],challenge:["Listen before negotiating","Save first, spend later","Dollar-cost average small investments"]},
+5:{title:"Taurus – The Builder",traits:"Practical, seeks asset growth. Great for real estate, bonds, treasury.",careers:["Real Estate Manager","Fixed Income Trader","Wealth Preservation Specialist","Corporate Treasurer"],salary:["$55k–$140k","Steady growth in asset management","Job security in stable sectors"],challenge:["Upgrade outdated skills","Invest savings wisely","Hold long-term investments like digital gold"]},
+6:{title:"Gemini – The Communicator",traits:"Analytical, versatile. Great for PR, sales, consulting, brokerage.",careers:["Financial PR","Sales & Trading","Management Consultant","Broker/Dealer"],salary:["$50k–$130k","Commission-based upside","Strong client trust is key"],challenge:["Clearly define scope of work","Use budget tracking apps","Teach others blockchain basics"]},
+7:{title:"Cancer – The Protector",traits:"Security-focused, intuitive. Compliance and risk management fit well.",careers:["Compliance Officer","Risk Analyst","Insurance Underwriter","Fraud Investigator"],salary:["$50k–$120k","Stable salaries with benefits","High value on security"],challenge:["Ask fair compensation","Build emergency fund","Learn self-custody wallets"]},
+8:{title:"Leo – The Leader",traits:"Charismatic, confident. Management and hedge fund leadership thrive.",careers:["CFO","Hedge Fund Manager","Institutional Sales Director","Investor Relations Director"],salary:["$90k–$250k+","Leadership bonuses","Requires strong emotional intelligence"],challenge:["Value team contributions","Avoid luxury overspending","Educate about crypto safely"]},
+9:{title:"Virgo – The Auditor",traits:"Detail-oriented, analytical. Optimizes systems and budgets.",careers:["Forensic Accountant","Internal Auditor","Budget Analyst","System Analyst"],salary:["$55k–$130k","Specialization growth","Efficiency saves company money"],challenge:["Prioritize risks","Zero-based budgeting","Track crypto transaction costs"]},
+10:{title:"Libra – The Harmonizer",traits:"Diplomatic, fair, good at finance law and arbitration.",careers:["Corporate Lawyer","Financial Mediator","International Finance Specialist","Compliance Consultant"],salary:["$80k–$180k","Ethical and high responsibility","Growth via complex problem-solving"],challenge:["Learn to say no","Focus on ethical investing","Research DAO governance"]},
+11:{title:"Scorpio – The Transformer",traits:"Intense, research-driven. Great for M&A, distressed debt, cybersecurity.",careers:["M&A Analyst","Turnaround Specialist","Distressed Debt Trader","Cybersecurity Risk Manager"],salary:["$70k–$200k+","High bonus potential","High-reward roles require resilience"],challenge:["Empower others","Use tax-advantaged accounts","Be prepared for market volatility"]},
+12:{title:"Sagittarius – The Explorer",traits:"Optimistic, global-minded. Suited for global markets and economics.",careers:["Global Market Analyst","Commodity Trader","Economic Forecaster","International Banking Consultant"],salary:["$60k–$160k","Travel or remote opportunities","Macro insight drives compensation"],challenge:["Focus on core skills","Budget for experiences","Research global crypto regulations"]}
+};
+
+// Tips / Pop-up Memes
+const tips=[
+"💸 'Saving today = buying your dreams tomorrow!'",
+"📊 'Tracking your allowance is the new superpower!'",
+"🚀 'Even $5 invested early grows faster than expected!'",
+"🔒 'Digital wallets are your treasure chests; guard them!'",
+"📈 'Stocks are like leveling up in real life. Learn early!'",
+"🎯 'Diversify small allowances before dreaming big!'",
+"💡 'Compare offers before any internship or side hustle.'",
+"📱 'Budgeting apps = cheat codes for teens!'"
+];
+
+// Utilities
+function getZodiac(month,day){
+if((month==12&&day>=22)||(month==1&&day<=19))return 1;
+if((month==1&&day>=20)||(month==2&&day<=18))return 2;
+if((month==2&&day>=19)||(month==3&&day<=20))return 3;
+if((month==3&&day>=21)||(month==4&&day<=19))return 4;
+if((month==4&&day>=20)||(month==5&&day<=20))return 5;
+if((month==5&&day>=21)||(month==6&&day<=20))return 6;
+if((month==6&&day>=21)||(month==7&&day<=22))return 7;
+if((month==7&&day>=23)||(month==8&&day<=22))return 8;
+if((month==8&&day>=23)||(month==9&&day<=22))return 9;
+if((month==9&&day>=23)||(month==10&&day<=22))return 10;
+if((month==10&&day>=23)||(month==11&&day<=21))return 11;
+if((month==11&&day>=22)||(month==12&&day<=21))return 12;
+return 1;
+}
+
+const el={name:document.getElementById('name'),birth:document.getElementById('birth'),salary:document.getElementById('salary'),flexibility:document.getElementById('flexibility'),reveal:document.getElementById('reveal'),mainReportContainer:document.getElementById('mainReportContainer'),userNameDisplay:document.getElementById('userNameDisplay'),archetypeTitle:document.getElementById('archetypeTitle'),zodiacTraits:document.getElementById('zodiacTraits'),careerList:document.getElementById('careerList'),salaryList:document.getElementById('salaryList'),challengeList:document.getElementById('challengeList'),inputForm:document.getElementById('inputForm'),floatingNav:document.getElementById('floatingNav'),tipText:document.getElementById('tip-text'),scrollToTop:document.getElementById('scrollToTop'),resetFloat:document.getElementById('resetFloat')};
+
+function generateList(elm,arr){elm.innerHTML="";arr.forEach(i=>{const li=document.createElement('li');li.innerHTML=i;elm.appendChild(li);});}
+
+function generateReading(){
+const name=el.name.value.trim();
+const birth=el.birth.value;
+const salaryVal=el.salary.value;
+const flexVal=el.flexibility.value;
+if(!name||!birth||!salaryVal||!flexVal){alert("Please fill all fields!");return;}
+const b=new Date(birth);const month=b.getMonth()+1,day=b.getDate();
+const z=zodiacData[getZodiac(month,day)]||zodiacData[1];
+
+el.userNameDisplay.textContent=name;
+el.archetypeTitle.textContent=z.title;
+el.zodiacTraits.textContent=z.traits;
+
+generateList(el.careerList,z.careers);
+generateList(el.salaryList,[...z.salary,`Expected Salary: ${salaryVal}, Flexibility: ${flexVal}`]);
+generateList(el.challengeList,z.challenge);
+
+el.tipText.textContent=tips[Math.floor(Math.random()*tips.length)];
+
+el.mainReportContainer.style.display="block";
+el.floatingNav.style.display="flex";
+el.inputForm.style.display="none";
+
+document.querySelectorAll('.summary-card').forEach((panel,i)=>{setTimeout(()=>panel.classList.add('show'),i*120);});
+}
+
+el.reveal.addEventListener('click',generateReading);
+el.scrollToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+el.resetFloat.addEventListener('click',()=>{
+el.name.value='';el.birth.value='';el.salary.value='';el.flexibility.value='';
+el.mainReportContainer.style.display='none';
+el.inputForm.style.display='flex';
+el.floatingNav.style.display='none';
+document.querySelectorAll('.summary-card').forEach(panel=>panel.classList.remove('show'));
+});
+</script>
+</body>
+</html>
